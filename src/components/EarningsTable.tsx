@@ -32,7 +32,7 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
             <TableHead className="font-mono text-xs text-primary text-right">Revenue</TableHead>
             <TableHead className="font-mono text-xs text-primary text-right">EPS</TableHead>
             <TableHead className="font-mono text-xs text-primary text-right">Net Income</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">CapEx</TableHead>
+            
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,7 +49,7 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
                   {fmt(entry.netIncome)}
                 </span>
               </TableCell>
-              <TableCell className="font-mono text-sm text-right text-foreground">{fmt(entry.capex)}</TableCell>
+              
             </TableRow>
           ))}
         </TableBody>
