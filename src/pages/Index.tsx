@@ -5,6 +5,7 @@ import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
+import CompanySearch from "@/components/CompanySearch";
 import {
   Select,
   SelectContent,
@@ -73,18 +74,11 @@ const Index = () => {
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               Company
             </label>
-            <Select value={selectedTicker} onValueChange={setSelectedTicker}>
-              <SelectTrigger className="w-[280px] font-mono bg-card border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border max-h-[300px]">
-                {filteredCompanies.map((c) => (
-                  <SelectItem key={c.ticker} value={c.ticker} className="font-mono">
-                    {c.ticker} — {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CompanySearch
+              companies={filteredCompanies}
+              value={selectedTicker}
+              onSelect={setSelectedTicker}
+            />
           </div>
 
           <div className="space-y-1.5">
