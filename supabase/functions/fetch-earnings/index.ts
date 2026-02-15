@@ -35,11 +35,10 @@ Deno.serve(async (req) => {
     const { action, ticker } = await req.json();
 
     if (action === 'earnings' && ticker) {
-      // Fetch income statement and earnings in parallel
-      const [incomeRaw, earningsRaw] = await Promise.all([
-        fetchAV('INCOME_STATEMENT', ticker, apiKey),
-        fetchAV('EARNINGS', ticker, apiKey),
-      ]);
+      // Fetch sequentially to respect 1 req/sec rate limit
+      const incomeRaw = await fetchAV('INCOME_STATEMENT', ticker, apiKey);
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      const earningsRaw = await fetchAV('EARNINGS', ticker, apiKey);
 
       const quarterlyReports = incomeRaw.quarterlyReports;
       if (!quarterlyReports || quarterlyReports.length === 0) {
