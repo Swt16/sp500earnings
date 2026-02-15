@@ -21,7 +21,7 @@ const fmtEps = (val: number) => `$${val.toFixed(2)}`;
 const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
   const filtered = selectedQuarter
     ? data.filter((d) => d.quarter === selectedQuarter)
-    : data;
+    : [...data].reverse();
 
   return (
     <div className="rounded-lg border border-border overflow-hidden">
