@@ -7,6 +7,43 @@ const corsHeaders = {
 
 const AV_BASE = 'https://www.alphavantage.co/query';
 
+// Known stock splits: ticker -> array of { date, ratio }
+// ratio means old shares become ratio new shares (e.g., 10:1 = ratio 10)
+const KNOWN_SPLITS: Record<string, { date: string; ratio: number }[]> = {
+  NVDA: [{ date: '2024-06-10', ratio: 10 }, { date: '2021-07-20', ratio: 4 }],
+  AMZN: [{ date: '2022-06-06', ratio: 20 }],
+  GOOGL: [{ date: '2022-07-18', ratio: 20 }],
+  GOOG: [{ date: '2022-07-18', ratio: 20 }],
+  TSLA: [{ date: '2022-08-25', ratio: 3 }],
+  SHOP: [{ date: '2022-06-29', ratio: 10 }],
+  PANW: [{ date: '2022-09-14', ratio: 3 }],
+  DXCM: [{ date: '2022-06-10', ratio: 4 }],
+  CMG: [{ date: '2024-06-26', ratio: 50 }],
+  GE: [{ date: '2021-08-02', ratio: 0.125 }], // reverse split 1:8
+  WBA: [{ date: '2024-01-01', ratio: 0.125 }], // reverse split
+};
+
+function adjustForSplits(ticker: string, entries: { date: string; close: number; volume: number }[]) {
+  const splits = KNOWN_SPLITS[ticker.toUpperCase()];
+  if (!splits || splits.length === 0) return entries;
+
+  return entries.map((entry) => {
+    let adjustedClose = entry.close;
+    let adjustedVolume = entry.volume;
+    for (const split of splits) {
+      if (entry.date < split.date) {
+        adjustedClose = adjustedClose / split.ratio;
+        adjustedVolume = Math.round(adjustedVolume * split.ratio);
+      }
+    }
+    return {
+      ...entry,
+      close: Number(adjustedClose.toFixed(2)),
+      volume: adjustedVolume,
+    };
+  });
+}
+
 async function fetchAV(fn: string, symbol: string, apiKey: string) {
   const url = `${AV_BASE}?function=${fn}&symbol=${symbol}&apikey=${apiKey}`;
   const res = await fetch(url);
@@ -144,7 +181,7 @@ Deno.serve(async (req) => {
         const raw = await fetchAV('TIME_SERIES_MONTHLY', ticker, apiKey);
         const monthly = raw['Monthly Time Series'];
         if (monthly) {
-          priceEntries = Object.entries(monthly)
+          const rawEntries = Object.entries(monthly)
             .slice(0, 60)
             .map(([date, vals]: [string, any]) => ({
               date,
@@ -152,6 +189,8 @@ Deno.serve(async (req) => {
               volume: parseInt(vals['5. volume'], 10),
             }))
             .reverse();
+
+          priceEntries = adjustForSplits(upperTicker, rawEntries);
 
           await supabase.from('earnings_cache').upsert(
             { ticker: pricesCacheKey, data: priceEntries, fetched_at: new Date().toISOString() },
