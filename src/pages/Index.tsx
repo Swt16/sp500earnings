@@ -121,7 +121,7 @@ const Index = () => {
         {/* Error state */}
         {isError && !earningsData && (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-5 text-sm text-destructive font-mono">
-            Failed to load earnings data for {selectedTicker}. The FMP free tier only returns the 5 most recent quarters. Mag 7 companies have full hardcoded data as fallback.
+            Failed to load earnings data for {selectedTicker}. The daily API request limit may have been reached. Try again tomorrow or select a previously loaded company.
           </div>
         )}
 
