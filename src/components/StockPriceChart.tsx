@@ -1,6 +1,7 @@
 import {
-  AreaChart,
+  ComposedChart,
   Area,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -16,6 +17,12 @@ interface StockPriceChartProps {
   companyName: string;
 }
 
+const formatVolume = (v: number) => {
+  if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
+  if (v >= 1e6) return `${(v / 1e6).toFixed(0)}M`;
+  return `${v}`;
+};
+
 const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps) => {
   if (isLoading) {
     return <Skeleton className="h-[300px] w-full rounded-lg" />;
@@ -30,17 +37,18 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
   }
 
   const chartData = data.map((d) => ({
-    date: d.date.slice(0, 7), // YYYY-MM
+    date: d.date.slice(0, 7),
     close: d.close,
+    volume: d.volume,
   }));
 
   const minPrice = Math.floor(Math.min(...chartData.map((d) => d.close)) * 0.95);
   const maxPrice = Math.ceil(Math.max(...chartData.map((d) => d.close)) * 1.05);
 
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+        <ComposedChart data={chartData} margin={{ top: 5, right: 60, left: 10, bottom: 5 }}>
           <defs>
             <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="hsl(160, 100%, 45%)" stopOpacity={0.3} />
@@ -59,12 +67,22 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
             interval={5}
           />
           <YAxis
+            yAxisId="price"
             domain={[minPrice, maxPrice]}
             tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
             tickLine={{ stroke: "hsl(var(--border))" }}
             axisLine={{ stroke: "hsl(var(--border))" }}
             width={65}
             tickFormatter={(v) => `$${v}`}
+          />
+          <YAxis
+            yAxisId="volume"
+            orientation="right"
+            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }}
+            tickLine={{ stroke: "hsl(var(--border))" }}
+            axisLine={{ stroke: "hsl(var(--border))" }}
+            width={50}
+            tickFormatter={formatVolume}
           />
           <Tooltip
             contentStyle={{
@@ -76,16 +94,28 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
               color: "hsl(var(--foreground))",
             }}
             labelStyle={{ color: "hsl(var(--primary))", fontWeight: 600 }}
-            formatter={(value: number) => [`$${value.toFixed(2)}`, "Close"]}
+            formatter={(value: number, name: string) =>
+              name === "close"
+                ? [`$${value.toFixed(2)}`, "Close"]
+                : [formatVolume(value), "Volume"]
+            }
+          />
+          <Bar
+            yAxisId="volume"
+            dataKey="volume"
+            fill="hsl(200, 90%, 50%)"
+            opacity={0.2}
+            barSize={6}
           />
           <Area
+            yAxisId="price"
             type="monotone"
             dataKey="close"
             stroke="hsl(160, 100%, 45%)"
             strokeWidth={2}
             fill="url(#priceGradient)"
           />
-        </AreaChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
