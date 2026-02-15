@@ -91,13 +91,18 @@ function buildEntries(incomeRaw: any, earningsRaw: any, cashFlowRaw: any) {
       const eps = epsMap.get(dateStr) ?? 0;
       const capex = capexMap.get(dateStr) ?? 0;
 
+      const grossMargin = revenue > 0 ? Number(((grossProfit / revenue) * 100).toFixed(1)) : 0;
+      const operatingMargin = revenue > 0 ? Number(((operatingIncome / revenue) * 100).toFixed(1)) : 0;
+
       return {
         quarter,
         revenue: Number((revenue / 1e9).toFixed(2)),
         eps: Number(eps.toFixed(2)),
         netIncome: Number((netIncome / 1e9).toFixed(2)),
         capex: Number((capex / 1e9).toFixed(2)),
-        summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : '0.0'}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
+        grossMargin,
+        operatingMargin,
+        summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${grossMargin}% | Op. Margin: ${operatingMargin}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
       };
     })
     .reverse();

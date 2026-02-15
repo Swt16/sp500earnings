@@ -5,8 +5,11 @@ import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
+import MarginChart from "@/components/MarginChart";
 import StockPriceChart from "@/components/StockPriceChart";
 import CompanySearch from "@/components/CompanySearch";
+import AISummary from "@/components/AISummary";
+import CsvExport from "@/components/CsvExport";
 import {
   Select,
   SelectContent,
@@ -142,6 +145,14 @@ const Index = () => {
               <EarningsChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
+            {/* Margin Trends */}
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
+                Margin Trends
+              </h2>
+              <MarginChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
+            </div>
+
             {/* Stock Price Chart */}
             <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
@@ -150,12 +161,27 @@ const Index = () => {
               <StockPriceChart data={priceData} isLoading={priceLoading} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
-            {/* Table */}
+            {/* Table with Export */}
             <div>
-              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                Financial Data
-              </h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">
+                  Financial Data
+                </h2>
+                <CsvExport data={earningsData} ticker={selectedTicker} />
+              </div>
               <EarningsTable data={earningsData} selectedQuarter={quarterFilter} />
+            </div>
+
+            {/* AI Summary */}
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                AI Earnings Analysis
+              </h2>
+              <AISummary
+                ticker={selectedTicker}
+                companyName={selectedCompany?.name ?? selectedTicker}
+                earningsData={earningsData}
+              />
             </div>
 
             {/* Summary */}

@@ -6,6 +6,8 @@ export interface EarningsEntry {
   eps: number;           // dollars per share
   netIncome: number;     // in billions USD
   capex?: number;        // in billions USD (optional)
+  grossMargin?: number;  // percentage
+  operatingMargin?: number; // percentage
   summary: string;       // brief transcript summary
 }
 
