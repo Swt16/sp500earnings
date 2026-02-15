@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { allQuarters } from "@/data/earningsData";
 import { sp500Companies } from "@/data/sp500Companies";
-import { useCompanyEarnings, useMonthlyPrices } from "@/hooks/useEarningsData";
+import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
@@ -23,8 +23,8 @@ const Index = () => {
   const [selectedQuarter, setSelectedQuarter] = useState<string>("all");
   const [sectorFilter, setSectorFilter] = useState<string>("all");
 
-  const { data: earningsData, isLoading: earningsLoading, isError } = useCompanyEarnings(selectedTicker);
-  const { data: priceData, isLoading: priceLoading } = useMonthlyPrices(selectedTicker);
+  const { data: earningsData, monthlyPrices: priceData, isLoading: earningsLoading, isError } = useCompanyEarnings(selectedTicker);
+  const priceLoading = earningsLoading;
 
   const filteredCompanies = sectorFilter === "all"
     ? sp500Companies

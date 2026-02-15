@@ -87,103 +87,87 @@ Deno.serve(async (req) => {
     const { action, ticker } = await req.json();
 
     if (action === 'earnings' && ticker) {
-      // Check cache first (valid for 24 hours)
-      const { data: cached } = await supabase
+      const upperTicker = ticker.toUpperCase();
+      const pricesCacheKey = `${upperTicker}_PRICES`;
+
+      // Check earnings cache
+      const { data: cachedEarnings } = await supabase
         .from('earnings_cache')
         .select('data, fetched_at')
-        .eq('ticker', ticker.toUpperCase())
+        .eq('ticker', upperTicker)
         .single();
 
-      if (cached) {
-        const age = Date.now() - new Date(cached.fetched_at).getTime();
-        const ONE_DAY = 24 * 60 * 60 * 1000;
-        if (age < ONE_DAY) {
-          return new Response(
-            JSON.stringify({ ticker, data: cached.data }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-      }
+      // Check prices cache
+      const { data: cachedPrices } = await supabase
+        .from('earnings_cache')
+        .select('data, fetched_at')
+        .eq('ticker', pricesCacheKey)
+        .single();
 
-      // Cache miss or stale — fetch from Alpha Vantage
-      const incomeRaw = await fetchAV('INCOME_STATEMENT', ticker, apiKey);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      const earningsRaw = await fetchAV('EARNINGS', ticker, apiKey);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      const cashFlowRaw = await fetchAV('CASH_FLOW', ticker, apiKey);
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+      const earningsFresh = cachedEarnings && (Date.now() - new Date(cachedEarnings.fetched_at).getTime() < ONE_DAY);
+      const pricesFresh = cachedPrices && (Date.now() - new Date(cachedPrices.fetched_at).getTime() < ONE_DAY);
 
-      const entries = buildEntries(incomeRaw, earningsRaw, cashFlowRaw);
-
-      if (entries.length === 0) {
+      // If both are cached, return immediately
+      if (earningsFresh && pricesFresh) {
         return new Response(
-          JSON.stringify({ ticker, data: [], message: 'No quarterly data available' }),
+          JSON.stringify({ ticker, data: cachedEarnings.data, monthlyPrices: cachedPrices.data }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      // Upsert into cache
-      await supabase.from('earnings_cache').upsert(
-        { ticker: ticker.toUpperCase(), data: entries, fetched_at: new Date().toISOString() },
-        { onConflict: 'ticker' }
-      );
+      let entries = earningsFresh ? cachedEarnings.data : null;
+      let priceEntries = pricesFresh ? cachedPrices.data : null;
 
-      return new Response(
-        JSON.stringify({ ticker, data: entries }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+      // Fetch earnings if stale
+      if (!entries) {
+        const incomeRaw = await fetchAV('INCOME_STATEMENT', ticker, apiKey);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        const earningsRaw = await fetchAV('EARNINGS', ticker, apiKey);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        const cashFlowRaw = await fetchAV('CASH_FLOW', ticker, apiKey);
 
-    if (action === 'monthly_prices' && ticker) {
-      // Check cache
-      const cacheKey = `${ticker.toUpperCase()}_PRICES`;
-      const { data: cached } = await supabase
-        .from('earnings_cache')
-        .select('data, fetched_at')
-        .eq('ticker', cacheKey)
-        .single();
+        entries = buildEntries(incomeRaw, earningsRaw, cashFlowRaw);
 
-      if (cached) {
-        const age = Date.now() - new Date(cached.fetched_at).getTime();
-        const ONE_DAY = 24 * 60 * 60 * 1000;
-        if (age < ONE_DAY) {
-          return new Response(
-            JSON.stringify({ ticker, data: cached.data }),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        await supabase.from('earnings_cache').upsert(
+          { ticker: upperTicker, data: entries, fetched_at: new Date().toISOString() },
+          { onConflict: 'ticker' }
+        );
+      }
+
+      // Fetch prices if stale
+      if (!priceEntries) {
+        if (!earningsFresh) {
+          // We just made API calls above, add delay
+          await new Promise(resolve => setTimeout(resolve, 1200));
+        }
+        const raw = await fetchAV('TIME_SERIES_MONTHLY', ticker, apiKey);
+        const monthly = raw['Monthly Time Series'];
+        if (monthly) {
+          priceEntries = Object.entries(monthly)
+            .slice(0, 60)
+            .map(([date, vals]: [string, any]) => ({
+              date,
+              close: Number(parseFloat(vals['4. close']).toFixed(2)),
+              volume: parseInt(vals['5. volume'], 10),
+            }))
+            .reverse();
+
+          await supabase.from('earnings_cache').upsert(
+            { ticker: pricesCacheKey, data: priceEntries, fetched_at: new Date().toISOString() },
+            { onConflict: 'ticker' }
           );
         }
       }
 
-      const raw = await fetchAV('TIME_SERIES_MONTHLY', ticker, apiKey);
-      const monthly = raw['Monthly Time Series'];
-      if (!monthly) {
-        return new Response(
-          JSON.stringify({ ticker, data: [], message: 'No monthly price data' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const entries = Object.entries(monthly)
-        .slice(0, 60) // ~5 years
-        .map(([date, vals]: [string, any]) => ({
-          date,
-          close: Number(parseFloat(vals['4. close']).toFixed(2)),
-          volume: parseInt(vals['5. volume'], 10),
-        }))
-        .reverse();
-
-      await supabase.from('earnings_cache').upsert(
-        { ticker: cacheKey, data: entries, fetched_at: new Date().toISOString() },
-        { onConflict: 'ticker' }
-      );
-
       return new Response(
-        JSON.stringify({ ticker, data: entries }),
+        JSON.stringify({ ticker, data: entries, monthlyPrices: priceEntries ?? [] }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({ error: 'Invalid action. Use "earnings" or "monthly_prices" with a ticker.' }),
+      JSON.stringify({ error: 'Invalid action. Use "earnings" with a ticker.' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {

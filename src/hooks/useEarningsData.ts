@@ -13,44 +13,39 @@ export interface MonthlyPrice {
   volume: number;
 }
 
+interface EarningsResponse {
+  data: EarningsEntry[];
+  monthlyPrices: MonthlyPrice[];
+}
+
+async function fetchEarningsData(ticker: string): Promise<EarningsResponse> {
+  const { data, error } = await supabase.functions.invoke("fetch-earnings", {
+    body: { action: "earnings", ticker },
+  });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  if (!data?.data || data.data.length === 0) {
+    throw new Error("No data returned");
+  }
+  return { data: data.data, monthlyPrices: data.monthlyPrices ?? [] };
+}
+
 export function useCompanyEarnings(ticker: string) {
-  return useQuery<EarningsEntry[]>({
+  const query = useQuery<EarningsResponse>({
     queryKey: ["earnings", ticker],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("fetch-earnings", {
-        body: { action: "earnings", ticker },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      if (!data?.data || data.data.length === 0) {
-        throw new Error("No data returned");
-      }
-      return data.data;
-    },
+    queryFn: () => fetchEarningsData(ticker),
     staleTime: 1000 * 60 * 30,
     retry: 1,
     placeholderData: () => {
       const fallback = fallbackCompanies.find((c) => c.ticker === ticker);
-      return fallback?.data;
+      return fallback ? { data: fallback.data, monthlyPrices: [] } : undefined;
     },
   });
-}
 
-export function useMonthlyPrices(ticker: string) {
-  return useQuery<MonthlyPrice[]>({
-    queryKey: ["monthly_prices", ticker],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke("fetch-earnings", {
-        body: { action: "monthly_prices", ticker },
-      });
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-      if (!data?.data || data.data.length === 0) {
-        throw new Error("No price data returned");
-      }
-      return data.data;
-    },
-    staleTime: 1000 * 60 * 30,
-    retry: 1,
-  });
+  return {
+    data: query.data?.data,
+    monthlyPrices: query.data?.monthlyPrices,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
 }
