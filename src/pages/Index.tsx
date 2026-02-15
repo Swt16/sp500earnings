@@ -50,6 +50,9 @@ const Index = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <a href="/about" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
+              About
+            </a>
             <ThemeToggle />
           </div>
         </div>
