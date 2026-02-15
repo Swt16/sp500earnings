@@ -74,33 +74,33 @@ const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
       <div className="h-[350px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 18%)" />
+            <CartesianGrid strokeDasharray="3 3" className="[&>line]:stroke-border" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="quarter"
-              tick={{ fill: "hsl(215, 15%, 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
-              tickLine={{ stroke: "hsl(220, 15%, 18%)" }}
-              axisLine={{ stroke: "hsl(220, 15%, 18%)" }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tickLine={{ stroke: "hsl(var(--border))" }}
+              axisLine={{ stroke: "hsl(var(--border))" }}
               angle={-45}
               textAnchor="end"
               height={60}
               interval={1}
             />
             <YAxis
-              tick={{ fill: "hsl(215, 15%, 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
-              tickLine={{ stroke: "hsl(220, 15%, 18%)" }}
-              axisLine={{ stroke: "hsl(220, 15%, 18%)" }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tickLine={{ stroke: "hsl(var(--border))" }}
+              axisLine={{ stroke: "hsl(var(--border))" }}
               width={55}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(220, 18%, 12%)",
-                border: "1px solid hsl(220, 15%, 18%)",
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
                 borderRadius: "8px",
                 fontFamily: "JetBrains Mono",
                 fontSize: "12px",
-                color: "hsl(210, 20%, 90%)",
+                color: "hsl(var(--foreground))",
               }}
-              labelStyle={{ color: "hsl(160, 100%, 45%)", fontWeight: 600 }}
+              labelStyle={{ color: "hsl(var(--primary))", fontWeight: 600 }}
             />
             {metrics
               .filter((m) => activeMetrics.has(m.key))

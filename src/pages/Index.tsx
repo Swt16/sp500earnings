@@ -2,6 +2,7 @@ import { useState } from "react";
 import { allQuarters } from "@/data/earningsData";
 import { sp500Companies } from "@/data/sp500Companies";
 import { useCompanyEarnings } from "@/hooks/useEarningsData";
+import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
 import {
@@ -42,7 +43,8 @@ const Index = () => {
               S&P 500 Quarterly Data · Live
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse-glow" />
             <span className="text-xs font-mono text-muted-foreground">
               {sp500Companies.length} COMPANIES

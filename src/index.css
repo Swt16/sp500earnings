@@ -36,10 +36,11 @@
 
     --radius: 0.5rem;
 
-    --chart-revenue: 160 100% 45%;
-    --chart-eps: 200 90% 50%;
-    --chart-income: 45 100% 55%;
-    --chart-capex: 340 80% 60%;
+    --chart-grid: 220 15% 18%;
+    --chart-tick: 215 15% 50%;
+    --chart-tooltip-bg: 220 18% 12%;
+    --chart-tooltip-border: 220 15% 18%;
+    --chart-tooltip-text: 210 20% 90%;
 
     --sidebar-background: 220 18% 10%;
     --sidebar-foreground: 210 20% 80%;
@@ -49,6 +50,51 @@
     --sidebar-accent-foreground: 210 20% 80%;
     --sidebar-border: 220 15% 18%;
     --sidebar-ring: 160 100% 45%;
+  }
+
+  .light {
+    --background: 0 0% 97%;
+    --foreground: 220 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
+
+    --primary: 160 100% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 15% 30%;
+
+    --muted: 220 15% 94%;
+    --muted-foreground: 215 15% 45%;
+
+    --accent: 200 90% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 160 100% 32%;
+
+    --chart-grid: 220 15% 88%;
+    --chart-tick: 215 15% 45%;
+    --chart-tooltip-bg: 0 0% 100%;
+    --chart-tooltip-border: 220 15% 85%;
+    --chart-tooltip-text: 220 20% 12%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 15% 30%;
+    --sidebar-primary: 160 100% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 92%;
+    --sidebar-accent-foreground: 220 15% 30%;
+    --sidebar-border: 220 15% 85%;
+    --sidebar-ring: 160 100% 32%;
   }
 }
 
