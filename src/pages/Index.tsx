@@ -103,9 +103,14 @@ const Index = () => {
               <p className="text-2xl font-mono font-bold text-foreground">
                 {selectedTicker}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {selectedCompany?.name ?? selectedTicker}
-              </p>
+              <a
+                href={`https://finance.yahoo.com/quote/${selectedTicker}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline"
+              >
+                {selectedCompany?.name ?? selectedTicker} ↗
+              </a>
             </div>
           </div>
         </div>
