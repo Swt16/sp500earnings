@@ -3,17 +3,30 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const FMP_BASE = 'https://financialmodelingprep.com/stable';
+const AV_BASE = 'https://www.alphavantage.co/query';
+
+async function fetchAV(fn: string, symbol: string, apiKey: string) {
+  const url = `${AV_BASE}?function=${fn}&symbol=${symbol}&apikey=${apiKey}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Alpha Vantage error [${res.status}]: ${text}`);
+  }
+  const raw = await res.json();
+  if (raw['Note'] || raw['Information']) throw new Error(raw['Note'] || raw['Information']);
+  if (raw['Error Message']) throw new Error(raw['Error Message']);
+  return raw;
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const apiKey = Deno.env.get('FMP_API_KEY');
+  const apiKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: 'FMP_API_KEY not configured' }),
+      JSON.stringify({ error: 'ALPHA_VANTAGE_API_KEY not configured' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -22,38 +35,55 @@ Deno.serve(async (req) => {
     const { action, ticker } = await req.json();
 
     if (action === 'earnings' && ticker) {
-      // Free tier: limit=5 max
-      const res = await fetch(
-        `${FMP_BASE}/income-statement?symbol=${ticker}&period=quarter&limit=5&apikey=${apiKey}`
-      );
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`FMP error [${res.status}]: ${text}`);
-      }
-      const incomeData = await res.json();
+      // Fetch income statement and earnings in parallel
+      const [incomeRaw, earningsRaw] = await Promise.all([
+        fetchAV('INCOME_STATEMENT', ticker, apiKey),
+        fetchAV('EARNINGS', ticker, apiKey),
+      ]);
 
-      if (!Array.isArray(incomeData) || incomeData.length === 0) {
+      const quarterlyReports = incomeRaw.quarterlyReports;
+      if (!quarterlyReports || quarterlyReports.length === 0) {
         return new Response(
-          JSON.stringify({ ticker, data: [], message: 'No data available for this ticker' }),
+          JSON.stringify({ ticker, data: [], message: 'No quarterly data available' }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      const entries = incomeData
+      // Build EPS lookup from EARNINGS endpoint
+      const epsMap = new Map<string, number>();
+      if (earningsRaw.quarterlyEarnings) {
+        for (const e of earningsRaw.quarterlyEarnings) {
+          // Key by fiscalDateEnding
+          const eps = parseFloat(e.reportedEPS);
+          if (!isNaN(eps)) {
+            epsMap.set(e.fiscalDateEnding, eps);
+          }
+        }
+      }
+
+      const entries = quarterlyReports
+        .slice(0, 20)
         .map((item: any) => {
-          const year = item.calendarYear || new Date(item.date).getFullYear();
-          const quarter = item.period ? `${item.period} ${year}` : `Q1 ${year}`;
-          const revenue = item.revenue || 0;
-          const grossProfit = item.grossProfit || 0;
-          const operatingIncome = item.operatingIncome || 0;
+          const dateStr = item.fiscalDateEnding;
+          const date = new Date(dateStr);
+          const year = date.getFullYear();
+          const month = date.getMonth();
+          const q = Math.floor(month / 3) + 1;
+          const quarter = `Q${q} ${year}`;
+
+          const revenue = parseFloat(item.totalRevenue) || 0;
+          const grossProfit = parseFloat(item.grossProfit) || 0;
+          const operatingIncome = parseFloat(item.operatingIncome) || 0;
+          const netIncome = parseFloat(item.netIncome) || 0;
+          const eps = epsMap.get(dateStr) ?? 0;
 
           return {
             quarter,
             revenue: Number((revenue / 1e9).toFixed(2)),
-            eps: Number((item.eps ?? 0).toFixed(2)),
-            netIncome: Number(((item.netIncome || 0) / 1e9).toFixed(2)),
-            capex: Number((Math.abs(item.capitalExpenditure || 0) / 1e9).toFixed(2)),
-            summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : 0}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
+            eps: Number(eps.toFixed(2)),
+            netIncome: Number((netIncome / 1e9).toFixed(2)),
+            capex: 0,
+            summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : '0.0'}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
           };
         })
         .reverse();
