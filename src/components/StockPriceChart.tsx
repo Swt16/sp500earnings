@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { MonthlyPrice } from "@/hooks/useEarningsData";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StockPriceChartProps {
   data: MonthlyPrice[] | undefined;
@@ -24,6 +25,7 @@ const formatVolume = (v: number) => {
 };
 
 const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps) => {
+  const isMobile = useIsMobile();
   if (isLoading) {
     return <Skeleton className="h-[300px] w-full rounded-lg" />;
   }
@@ -46,9 +48,9 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
   const maxPrice = Math.ceil(Math.max(...chartData.map((d) => d.close)) * 1.05);
 
   return (
-    <div className="h-[350px] w-full">
+    <div className={`${isMobile ? 'h-[280px]' : 'h-[350px]'} w-full`}>
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={chartData} margin={{ top: 5, right: 60, left: 10, bottom: 5 }}>
+        <ComposedChart data={chartData} margin={{ top: 5, right: isMobile ? 10 : 60, left: isMobile ? 0 : 10, bottom: 5 }}>
           <defs>
             <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="hsl(160, 100%, 45%)" stopOpacity={0.3} />
@@ -58,32 +60,34 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis
             dataKey="date"
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: isMobile ? 9 : 11, fontFamily: "JetBrains Mono" }}
             tickLine={{ stroke: "hsl(var(--border))" }}
             axisLine={{ stroke: "hsl(var(--border))" }}
             angle={-45}
             textAnchor="end"
-            height={60}
-            interval={5}
+            height={isMobile ? 50 : 60}
+            interval={isMobile ? 11 : 5}
           />
           <YAxis
             yAxisId="price"
             domain={[minPrice, maxPrice]}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: isMobile ? 9 : 11, fontFamily: "JetBrains Mono" }}
             tickLine={{ stroke: "hsl(var(--border))" }}
             axisLine={{ stroke: "hsl(var(--border))" }}
-            width={65}
+            width={isMobile ? 45 : 65}
             tickFormatter={(v) => `$${v}`}
           />
-          <YAxis
-            yAxisId="volume"
-            orientation="right"
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }}
-            tickLine={{ stroke: "hsl(var(--border))" }}
-            axisLine={{ stroke: "hsl(var(--border))" }}
-            width={50}
-            tickFormatter={formatVolume}
-          />
+          {!isMobile && (
+            <YAxis
+              yAxisId="volume"
+              orientation="right"
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              tickLine={{ stroke: "hsl(var(--border))" }}
+              axisLine={{ stroke: "hsl(var(--border))" }}
+              width={50}
+              tickFormatter={formatVolume}
+            />
+          )}
           <Tooltip
             contentStyle={{
               backgroundColor: "hsl(var(--card))",
@@ -100,13 +104,15 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
                 : [formatVolume(value), "Volume"]
             }
           />
-          <Bar
-            yAxisId="volume"
-            dataKey="volume"
-            fill="hsl(200, 90%, 50%)"
-            opacity={0.2}
-            barSize={6}
-          />
+          {!isMobile && (
+            <Bar
+              yAxisId="volume"
+              dataKey="volume"
+              fill="hsl(200, 90%, 50%)"
+              opacity={0.2}
+              barSize={6}
+            />
+          )}
           <Area
             yAxisId="price"
             type="monotone"

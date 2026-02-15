@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   LineChart,
   Line,
@@ -26,6 +27,7 @@ const metrics: { key: MetricKey; label: string; color: string }[] = [
 ];
 
 const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
+  const isMobile = useIsMobile();
   const [activeMetrics, setActiveMetrics] = useState<Set<MetricKey>>(
     new Set(["revenue"])
   );
@@ -73,25 +75,25 @@ const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
         ))}
       </div>
 
-      <div className="h-[350px] w-full">
+      <div className={`${isMobile ? 'h-[280px]' : 'h-[350px]'} w-full`}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: isMobile ? 5 : 20, left: isMobile ? 0 : 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" className="[&>line]:stroke-border" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="quarter"
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: isMobile ? 9 : 11, fontFamily: "JetBrains Mono" }}
               tickLine={{ stroke: "hsl(var(--border))" }}
               axisLine={{ stroke: "hsl(var(--border))" }}
               angle={-45}
               textAnchor="end"
-              height={60}
-              interval={1}
+              height={isMobile ? 50 : 60}
+              interval={isMobile ? 3 : 1}
             />
             <YAxis
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: isMobile ? 9 : 11, fontFamily: "JetBrains Mono" }}
               tickLine={{ stroke: "hsl(var(--border))" }}
               axisLine={{ stroke: "hsl(var(--border))" }}
-              width={55}
+              width={isMobile ? 40 : 55}
             />
             <Tooltip
               contentStyle={{
