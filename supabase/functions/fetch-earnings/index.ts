@@ -20,7 +20,7 @@ async function fetchAV(fn: string, symbol: string, apiKey: string) {
   return raw;
 }
 
-function buildEntries(incomeRaw: any, earningsRaw: any) {
+function buildEntries(incomeRaw: any, earningsRaw: any, cashFlowRaw: any) {
   const quarterlyReports = incomeRaw.quarterlyReports;
   if (!quarterlyReports || quarterlyReports.length === 0) return [];
 
@@ -29,6 +29,14 @@ function buildEntries(incomeRaw: any, earningsRaw: any) {
     for (const e of earningsRaw.quarterlyEarnings) {
       const eps = parseFloat(e.reportedEPS);
       if (!isNaN(eps)) epsMap.set(e.fiscalDateEnding, eps);
+    }
+  }
+
+  const capexMap = new Map<string, number>();
+  if (cashFlowRaw.quarterlyReports) {
+    for (const r of cashFlowRaw.quarterlyReports) {
+      const capex = parseFloat(r.capitalExpenditures);
+      if (!isNaN(capex)) capexMap.set(r.fiscalDateEnding, Math.abs(capex));
     }
   }
 
@@ -44,13 +52,14 @@ function buildEntries(incomeRaw: any, earningsRaw: any) {
       const operatingIncome = parseFloat(item.operatingIncome) || 0;
       const netIncome = parseFloat(item.netIncome) || 0;
       const eps = epsMap.get(dateStr) ?? 0;
+      const capex = capexMap.get(dateStr) ?? 0;
 
       return {
         quarter,
         revenue: Number((revenue / 1e9).toFixed(2)),
         eps: Number(eps.toFixed(2)),
         netIncome: Number((netIncome / 1e9).toFixed(2)),
-        
+        capex: Number((capex / 1e9).toFixed(2)),
         summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : '0.0'}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
       };
     })
@@ -100,8 +109,10 @@ Deno.serve(async (req) => {
       const incomeRaw = await fetchAV('INCOME_STATEMENT', ticker, apiKey);
       await new Promise(resolve => setTimeout(resolve, 1200));
       const earningsRaw = await fetchAV('EARNINGS', ticker, apiKey);
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      const cashFlowRaw = await fetchAV('CASH_FLOW', ticker, apiKey);
 
-      const entries = buildEntries(incomeRaw, earningsRaw);
+      const entries = buildEntries(incomeRaw, earningsRaw, cashFlowRaw);
 
       if (entries.length === 0) {
         return new Response(
