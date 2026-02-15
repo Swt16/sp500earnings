@@ -5,7 +5,7 @@ export interface EarningsEntry {
   revenue: number;       // in billions USD
   eps: number;           // dollars per share
   netIncome: number;     // in billions USD
-  capex: number;         // in billions USD
+  capex?: number;        // in billions USD (optional)
   summary: string;       // brief transcript summary
 }
 

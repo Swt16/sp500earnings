@@ -50,7 +50,7 @@ function buildEntries(incomeRaw: any, earningsRaw: any) {
         revenue: Number((revenue / 1e9).toFixed(2)),
         eps: Number(eps.toFixed(2)),
         netIncome: Number((netIncome / 1e9).toFixed(2)),
-        capex: 0,
+        
         summary: `Revenue: $${(revenue / 1e9).toFixed(1)}B | Gross Margin: ${revenue > 0 ? ((grossProfit / revenue) * 100).toFixed(1) : '0.0'}% | Op. Income: $${(operatingIncome / 1e9).toFixed(1)}B`,
       };
     })

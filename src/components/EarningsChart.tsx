@@ -16,13 +16,12 @@ interface EarningsChartProps {
   companyName: string;
 }
 
-type MetricKey = "revenue" | "eps" | "netIncome" | "capex";
+type MetricKey = "revenue" | "eps" | "netIncome";
 
 const metrics: { key: MetricKey; label: string; color: string }[] = [
   { key: "revenue", label: "Revenue ($B)", color: "hsl(160, 100%, 45%)" },
   { key: "eps", label: "EPS ($)", color: "hsl(200, 90%, 50%)" },
   { key: "netIncome", label: "Net Income ($B)", color: "hsl(45, 100%, 55%)" },
-  { key: "capex", label: "CapEx ($B)", color: "hsl(340, 80%, 60%)" },
 ];
 
 const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
@@ -47,7 +46,6 @@ const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
     revenue: d.revenue,
     eps: d.eps,
     netIncome: d.netIncome,
-    capex: d.capex,
   }));
 
   return (
