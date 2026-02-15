@@ -45,10 +45,6 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <span className="h-2 w-2 rounded-full bg-primary animate-pulse-glow" />
-            <span className="text-xs font-mono text-muted-foreground">
-              {sp500Companies.length} COMPANIES
-            </span>
           </div>
         </div>
       </header>
