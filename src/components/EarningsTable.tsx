@@ -33,6 +33,8 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
             <TableHead className="font-mono text-xs text-primary text-right">EPS</TableHead>
             <TableHead className="font-mono text-xs text-primary text-right">Net Income</TableHead>
             <TableHead className="font-mono text-xs text-primary text-right">CapEx</TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right">Gross Margin</TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right">Op. Margin</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -50,6 +52,8 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
                 </span>
               </TableCell>
               <TableCell className="font-mono text-sm text-right text-foreground">{fmt(entry.capex ?? 0)}</TableCell>
+              <TableCell className="font-mono text-sm text-right text-foreground">{(entry.grossMargin ?? 0).toFixed(1)}%</TableCell>
+              <TableCell className="font-mono text-sm text-right text-foreground">{(entry.operatingMargin ?? 0).toFixed(1)}%</TableCell>
             </TableRow>
           ))}
         </TableBody>
