@@ -1,3 +1,5 @@
+import ThemeToggle from "@/components/ThemeToggle";
+
 const About = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -6,6 +8,7 @@ const About = () => {
           <a href="/" className="text-xl font-mono font-bold text-primary tracking-tight hover:underline">
             EARNINGS TERMINAL
           </a>
+          <ThemeToggle />
         </div>
       </header>
 
