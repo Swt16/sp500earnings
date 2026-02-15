@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { companies, allQuarters } from "@/data/earningsData";
+import { allQuarters } from "@/data/earningsData";
+import { sp500Companies } from "@/data/sp500Companies";
+import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
 import {
@@ -9,17 +11,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const sectors = Array.from(new Set(sp500Companies.map((c) => c.sector))).sort();
 
 const Index = () => {
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
   const [selectedQuarter, setSelectedQuarter] = useState<string>("all");
+  const [sectorFilter, setSectorFilter] = useState<string>("all");
 
-  const company = companies.find((c) => c.ticker === selectedTicker)!;
+  const { data: earningsData, isLoading: earningsLoading, isError } = useCompanyEarnings(selectedTicker);
+
+  const filteredCompanies = sectorFilter === "all"
+    ? sp500Companies
+    : sp500Companies.filter((c) => c.sector === sectorFilter);
+
+  const selectedCompany = sp500Companies.find((c) => c.ticker === selectedTicker);
   const quarterFilter = selectedQuarter === "all" ? null : selectedQuarter;
+  const availableQuarters = earningsData?.map((d) => d.quarter) ?? allQuarters;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
@@ -27,12 +39,14 @@ const Index = () => {
               EARNINGS TERMINAL
             </h1>
             <p className="text-xs font-mono text-muted-foreground mt-0.5">
-              Mag 7 Quarterly Data · 2021–2025
+              S&P 500 Quarterly Data · Live
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse-glow" />
-            <span className="text-xs font-mono text-muted-foreground">LIVE</span>
+            <span className="text-xs font-mono text-muted-foreground">
+              {sp500Companies.length} COMPANIES
+            </span>
           </div>
         </div>
       </header>
@@ -42,14 +56,31 @@ const Index = () => {
         <div className="flex flex-wrap gap-4 items-end">
           <div className="space-y-1.5">
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+              Sector
+            </label>
+            <Select value={sectorFilter} onValueChange={setSectorFilter}>
+              <SelectTrigger className="w-[200px] font-mono bg-card border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border max-h-[300px]">
+                <SelectItem value="all" className="font-mono">All Sectors</SelectItem>
+                {sectors.map((s) => (
+                  <SelectItem key={s} value={s} className="font-mono">{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               Company
             </label>
             <Select value={selectedTicker} onValueChange={setSelectedTicker}>
-              <SelectTrigger className="w-[220px] font-mono bg-card border-border">
+              <SelectTrigger className="w-[280px] font-mono bg-card border-border">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                {companies.map((c) => (
+              <SelectContent className="bg-popover border-border max-h-[300px]">
+                {filteredCompanies.map((c) => (
                   <SelectItem key={c.ticker} value={c.ticker} className="font-mono">
                     {c.ticker} — {c.name}
                   </SelectItem>
@@ -67,13 +98,9 @@ const Index = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border max-h-[300px]">
-                <SelectItem value="all" className="font-mono">
-                  All Quarters
-                </SelectItem>
-                {allQuarters.map((q) => (
-                  <SelectItem key={q} value={q} className="font-mono">
-                    {q}
-                  </SelectItem>
+                <SelectItem value="all" className="font-mono">All Quarters</SelectItem>
+                {availableQuarters.map((q) => (
+                  <SelectItem key={q} value={q} className="font-mono">{q}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -82,58 +109,79 @@ const Index = () => {
           <div className="ml-auto flex items-center gap-3">
             <div className="text-right">
               <p className="text-2xl font-mono font-bold text-foreground">
-                {company.ticker}
+                {selectedTicker}
               </p>
-              <p className="text-sm text-muted-foreground">{company.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {selectedCompany?.name ?? selectedTicker}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Chart */}
-        <div className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
-            Trend Analysis
-          </h2>
-          <EarningsChart data={company.data} companyName={company.name} />
-        </div>
-
-        {/* Table */}
-        <div>
-          <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-            Financial Data
-          </h2>
-          <EarningsTable data={company.data} selectedQuarter={quarterFilter} />
-        </div>
-
-        {/* Transcript Summary */}
-        {quarterFilter ? (
-          <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-              Earnings Call Summary — {quarterFilter}
-            </h2>
-            <p className="text-sm text-foreground leading-relaxed">
-              {company.data.find((d) => d.quarter === quarterFilter)?.summary}
-            </p>
+        {/* Loading state */}
+        {earningsLoading && !earningsData && (
+          <div className="space-y-4">
+            <Skeleton className="h-[350px] w-full rounded-lg" />
+            <Skeleton className="h-[200px] w-full rounded-lg" />
           </div>
-        ) : (
-          <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-              Recent Earnings Call Summaries
-            </h2>
-            <div className="space-y-3">
-              {company.data
-                .slice(-4)
-                .reverse()
-                .map((entry) => (
-                  <div key={entry.quarter} className="border-l-2 border-primary/30 pl-4">
-                    <p className="text-xs font-mono text-primary mb-1">{entry.quarter}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {entry.summary}
-                    </p>
-                  </div>
-                ))}
+        )}
+
+        {/* Error state */}
+        {isError && !earningsData && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-5 text-sm text-destructive font-mono">
+            Failed to load earnings data for {selectedTicker}. The FMP free tier only returns the 5 most recent quarters. Mag 7 companies have full hardcoded data as fallback.
+          </div>
+        )}
+
+        {earningsData && (
+          <>
+            {/* Chart */}
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
+                Trend Analysis
+              </h2>
+              <EarningsChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
-          </div>
+
+            {/* Table */}
+            <div>
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                Financial Data
+              </h2>
+              <EarningsTable data={earningsData} selectedQuarter={quarterFilter} />
+            </div>
+
+            {/* Summary */}
+            {quarterFilter ? (
+              <div className="rounded-lg border border-border bg-card p-5">
+                <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                  Quarter Summary — {quarterFilter}
+                </h2>
+                <p className="text-sm text-foreground leading-relaxed">
+                  {earningsData.find((d) => d.quarter === quarterFilter)?.summary}
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-border bg-card p-5">
+                <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                  Recent Quarter Summaries
+                </h2>
+                <div className="space-y-3">
+                  {earningsData
+                    .slice(-4)
+                    .reverse()
+                    .map((entry) => (
+                      <div key={entry.quarter} className="border-l-2 border-primary/30 pl-4">
+                        <p className="text-xs font-mono text-primary mb-1">{entry.quarter}</p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {entry.summary}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
