@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { allQuarters } from "@/data/earningsData";
 import { sp500Companies } from "@/data/sp500Companies";
-import { useCompanyEarnings } from "@/hooks/useEarningsData";
+import { useCompanyEarnings, useMonthlyPrices } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
+import StockPriceChart from "@/components/StockPriceChart";
 import CompanySearch from "@/components/CompanySearch";
 import {
   Select,
@@ -23,6 +24,7 @@ const Index = () => {
   const [sectorFilter, setSectorFilter] = useState<string>("all");
 
   const { data: earningsData, isLoading: earningsLoading, isError } = useCompanyEarnings(selectedTicker);
+  const { data: priceData, isLoading: priceLoading } = useMonthlyPrices(selectedTicker);
 
   const filteredCompanies = sectorFilter === "all"
     ? sp500Companies
@@ -138,6 +140,14 @@ const Index = () => {
                 Trend Analysis
               </h2>
               <EarningsChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
+            </div>
+
+            {/* Stock Price Chart */}
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
+                Monthly Stock Price
+              </h2>
+              <StockPriceChart data={priceData} isLoading={priceLoading} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
             {/* Table */}
