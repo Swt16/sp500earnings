@@ -133,8 +133,57 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (action === 'monthly_prices' && ticker) {
+      // Check cache
+      const cacheKey = `${ticker.toUpperCase()}_PRICES`;
+      const { data: cached } = await supabase
+        .from('earnings_cache')
+        .select('data, fetched_at')
+        .eq('ticker', cacheKey)
+        .single();
+
+      if (cached) {
+        const age = Date.now() - new Date(cached.fetched_at).getTime();
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        if (age < ONE_DAY) {
+          return new Response(
+            JSON.stringify({ ticker, data: cached.data }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+
+      const raw = await fetchAV('TIME_SERIES_MONTHLY', ticker, apiKey);
+      const monthly = raw['Monthly Time Series'];
+      if (!monthly) {
+        return new Response(
+          JSON.stringify({ ticker, data: [], message: 'No monthly price data' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const entries = Object.entries(monthly)
+        .slice(0, 60) // ~5 years
+        .map(([date, vals]: [string, any]) => ({
+          date,
+          close: Number(parseFloat(vals['4. close']).toFixed(2)),
+          volume: parseInt(vals['5. volume'], 10),
+        }))
+        .reverse();
+
+      await supabase.from('earnings_cache').upsert(
+        { ticker: cacheKey, data: entries, fetched_at: new Date().toISOString() },
+        { onConflict: 'ticker' }
+      );
+
+      return new Response(
+        JSON.stringify({ ticker, data: entries }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: 'Invalid action. Use "earnings" with a ticker.' }),
+      JSON.stringify({ error: 'Invalid action. Use "earnings" or "monthly_prices" with a ticker.' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
