@@ -23,10 +23,7 @@ const About = () => {
           <h2 className="text-lg font-mono font-semibold text-primary">Data Sources</h2>
           <ul className="text-sm text-muted-foreground leading-relaxed list-disc pl-5 space-y-1.5">
             <li>
-              <strong className="text-foreground">Mag 7 companies</strong> — Hardcoded historical data covering 2021–2025 for immediate access without API calls.
-            </li>
-            <li>
-              <strong className="text-foreground">All other S&P 500 companies</strong> — Live data fetched from the Alpha Vantage API on demand.
+              <strong className="text-foreground">S&P 500 companies</strong> — Live data fetched from the Alpha Vantage API on demand.
             </li>
             <li>
               <strong className="text-foreground">Stock prices</strong> — Monthly adjusted close prices, also from Alpha Vantage.
