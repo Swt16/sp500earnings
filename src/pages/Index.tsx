@@ -53,6 +53,9 @@ const Index = () => {
             <a href="/about" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
               About
             </a>
+            <a href="/share" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
+              Share
+            </a>
             <ThemeToggle />
           </div>
         </div>
