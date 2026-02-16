@@ -19,6 +19,10 @@ const KNOWN_SPLITS: Record<string, { date: string; ratio: number }[]> = {
   PANW: [{ date: '2022-09-14', ratio: 3 }],
   DXCM: [{ date: '2022-06-10', ratio: 4 }],
   CMG: [{ date: '2024-06-26', ratio: 50 }],
+  AVGO: [{ date: '2024-07-15', ratio: 10 }],
+  WMT: [{ date: '2024-02-26', ratio: 3 }],
+  LRCX: [{ date: '2024-10-03', ratio: 10 }],
+  SONY: [{ date: '2024-10-09', ratio: 5 }],
   GE: [{ date: '2021-08-02', ratio: 0.125 }], // reverse split 1:8
   WBA: [{ date: '2024-01-01', ratio: 0.125 }], // reverse split
 };
