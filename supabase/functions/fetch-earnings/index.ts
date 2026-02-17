@@ -144,6 +144,16 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate the request includes the Supabase anon key
+  const requestApiKey = req.headers.get('apikey');
+  const expectedAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  if (!requestApiKey || requestApiKey !== expectedAnonKey) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid API key' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   const apiKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
   if (!apiKey) {
     return new Response(
@@ -158,6 +168,23 @@ Deno.serve(async (req) => {
 
   try {
     const { action, ticker } = await req.json();
+
+    // Validate ticker input
+    if (action === 'earnings') {
+      if (!ticker || typeof ticker !== 'string') {
+        return new Response(
+          JSON.stringify({ error: 'Ticker must be a non-empty string' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const tickerRegex = /^[A-Z]{1,5}$/;
+      if (!tickerRegex.test(ticker.toUpperCase())) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid ticker format. Must be 1-5 letters.' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     if (action === 'earnings' && ticker) {
       const upperTicker = ticker.toUpperCase();
