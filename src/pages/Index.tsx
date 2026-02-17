@@ -122,6 +122,11 @@ const Index = () => {
               >
                 {selectedCompany?.name ?? selectedTicker} ↗
               </a>
+              {selectedCompany?.sector && (
+                <p className="text-xs font-mono text-muted-foreground mt-0.5">
+                  {selectedCompany.sector}
+                </p>
+              )}
             </div>
           </div>
         </div>
