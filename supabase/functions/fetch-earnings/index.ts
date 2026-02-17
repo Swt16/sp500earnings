@@ -16,7 +16,7 @@ const KNOWN_SPLITS: Record<string, { date: string; ratio: number }[]> = {
   GOOG: [{ date: '2022-07-18', ratio: 20 }],
   TSLA: [{ date: '2022-08-25', ratio: 3 }],
   SHOP: [{ date: '2022-06-29', ratio: 10 }],
-  PANW: [{ date: '2022-09-14', ratio: 3 }],
+  PANW: [{ date: '2024-12-16', ratio: 2 }, { date: '2022-09-14', ratio: 3 }],
   DXCM: [{ date: '2022-06-10', ratio: 4 }],
   CMG: [{ date: '2024-06-26', ratio: 50 }],
   AVGO: [{ date: '2024-07-15', ratio: 10 }],
@@ -25,6 +25,33 @@ const KNOWN_SPLITS: Record<string, { date: string; ratio: number }[]> = {
   SONY: [{ date: '2024-10-09', ratio: 5 }],
   GE: [{ date: '2021-08-02', ratio: 0.125 }], // reverse split 1:8
   WBA: [{ date: '2024-01-01', ratio: 0.125 }], // reverse split
+  // 2025 splits
+  NOW: [{ date: '2025-12-18', ratio: 5 }],
+  NFLX: [{ date: '2025-11-17', ratio: 10 }],
+  IBKR: [{ date: '2025-06-18', ratio: 4 }],
+  ORLY: [{ date: '2025-06-10', ratio: 15 }],
+  FAST: [{ date: '2025-05-22', ratio: 2 }],
+  // 2024 splits (not previously listed)
+  TSCO: [{ date: '2024-12-20', ratio: 5 }],
+  SMCI: [{ date: '2024-10-01', ratio: 10 }],
+  DECK: [{ date: '2024-09-17', ratio: 6 }],
+  CTAS: [{ date: '2024-09-13', ratio: 4 }],
+  WSM: [{ date: '2024-07-09', ratio: 2 }],
+  APH: [{ date: '2024-06-12', ratio: 2 }],
+  ODFL: [{ date: '2024-03-28', ratio: 2 }],
+  // 2023 splits
+  CPRT: [{ date: '2023-10-16', ratio: 2 }],
+  MNST: [{ date: '2023-03-28', ratio: 2 }],
+  PCAR: [{ date: '2023-02-08', ratio: 1.5 }], // 3-for-2
+  // 2022 splits (not previously listed)
+  FTNT: [{ date: '2022-06-23', ratio: 5 }],
+  // 2021 splits (not previously listed)
+  MCHP: [{ date: '2021-10-12', ratio: 2 }],
+  ISRG: [{ date: '2021-10-05', ratio: 3 }],
+  RJF: [{ date: '2021-09-21', ratio: 1.5 }], // 3-for-2
+  CSGP: [{ date: '2021-06-29', ratio: 10 }],
+  CSX: [{ date: '2021-06-28', ratio: 3 }],
+  SHW: [{ date: '2021-04-01', ratio: 3 }],
 };
 
 function adjustForSplits(ticker: string, entries: { date: string; close: number; volume: number }[]) {
