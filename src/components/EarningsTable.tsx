@@ -6,7 +6,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import type { EarningsEntry } from "@/data/earningsData";
+
+const glossary: Record<string, string> = {
+  Revenue: "Total income generated from sales before any expenses are deducted.",
+  EPS: "Earnings Per Share — net profit divided by the number of outstanding shares.",
+  "Net Income": "Total profit after all expenses, taxes, and costs have been subtracted from revenue.",
+  CapEx: "Capital Expenditure — funds used to acquire or upgrade physical assets like equipment or buildings.",
+  "Gross Margin": "Percentage of revenue remaining after deducting the cost of goods sold.",
+  "Op. Margin": "Operating Margin — percentage of revenue remaining after deducting operating expenses.",
+};
+
+const HeaderWithTooltip = ({ label }: { label: string }) => {
+  const definition = glossary[label];
+  if (!definition) return <span>{label}</span>;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="inline-flex items-center gap-1 cursor-help">
+          {label}
+          <Info className="h-3 w-3 text-muted-foreground" />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-[250px] text-xs">
+        {definition}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
 
 interface EarningsTableProps {
   data: EarningsEntry[];
@@ -29,12 +62,12 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
         <TableHeader>
           <TableRow className="bg-secondary/50 hover:bg-secondary/50">
             <TableHead className="font-mono text-xs text-primary">Quarter</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">Revenue</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">EPS</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">Net Income</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">CapEx</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">Gross Margin</TableHead>
-            <TableHead className="font-mono text-xs text-primary text-right">Op. Margin</TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="Revenue" /></TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="EPS" /></TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="Net Income" /></TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="CapEx" /></TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="Gross Margin" /></TableHead>
+            <TableHead className="font-mono text-xs text-primary text-right"><HeaderWithTooltip label="Op. Margin" /></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
