@@ -8,15 +8,6 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Validate the request includes the Supabase anon key
-  const requestApiKey = req.headers.get('apikey');
-  const expectedAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-  if (!requestApiKey || requestApiKey !== expectedAnonKey) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid API key' }),
-      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  }
 
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   if (!LOVABLE_API_KEY) {
