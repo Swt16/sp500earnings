@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      const tickerRegex = /^[A-Z]{1,5}$/;
+      const tickerRegex = /^[A-Z]{1,5}(\.[A-Z]{1,2})?$/;
       if (!tickerRegex.test(ticker.toUpperCase())) {
         return new Response(
           JSON.stringify({ error: 'Invalid ticker format. Must be 1-5 letters.' }),
