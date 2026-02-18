@@ -244,6 +244,19 @@ Deno.serve(async (req) => {
 
         entries = buildEntries(incomeRaw, earningsRaw, cashFlowRaw);
 
+        // If earnings empty and ticker has a share class suffix (e.g. BF-B), try A-class
+        if (entries.length === 0 && /^[A-Z]+-[A-Z]$/.test(avTicker)) {
+          const aTicker = avTicker.replace(/-[A-Z]$/, '-A');
+          console.log(`No earnings for ${avTicker}, trying A-class: ${aTicker}`);
+          await new Promise(resolve => setTimeout(resolve, 1200));
+          const incomeA = await fetchAV('INCOME_STATEMENT', aTicker, apiKey);
+          await new Promise(resolve => setTimeout(resolve, 1200));
+          const earningsA = await fetchAV('EARNINGS', aTicker, apiKey);
+          await new Promise(resolve => setTimeout(resolve, 1200));
+          const cashFlowA = await fetchAV('CASH_FLOW', aTicker, apiKey);
+          entries = buildEntries(incomeA, earningsA, cashFlowA);
+        }
+
         await supabase.from('earnings_cache').upsert(
           { ticker: upperTicker, data: entries, fetched_at: new Date().toISOString() },
           { onConflict: 'ticker' }
