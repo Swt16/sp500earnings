@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { allQuarters } from "@/data/earningsData";
 import { sp500Companies } from "@/data/sp500Companies";
+import { Shuffle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
 import EarningsTable from "@/components/EarningsTable";
@@ -25,6 +27,12 @@ const Index = () => {
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
   const [selectedQuarter, setSelectedQuarter] = useState<string>("all");
   const [sectorFilter, setSectorFilter] = useState<string>("all");
+
+  const selectRandom = useCallback(() => {
+    const pool = sectorFilter === "all" ? sp500Companies : sp500Companies.filter((c) => c.sector === sectorFilter);
+    const random = pool[Math.floor(Math.random() * pool.length)];
+    if (random) setSelectedTicker(random.ticker);
+  }, [sectorFilter]);
 
   const { data: earningsData, monthlyPrices: priceData, isLoading: earningsLoading, isError } = useCompanyEarnings(selectedTicker);
   const priceLoading = earningsLoading;
@@ -108,6 +116,11 @@ const Index = () => {
               </SelectContent>
             </Select>
           </div>
+
+          <Button variant="outline" size="sm" onClick={selectRandom} className="font-mono">
+            <Shuffle className="h-4 w-4 mr-1" />
+            Random
+          </Button>
 
           <div className="ml-auto flex items-center gap-3">
             <div className="text-right">
