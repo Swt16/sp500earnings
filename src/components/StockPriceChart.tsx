@@ -11,6 +11,7 @@ import {
 import type { MonthlyPrice } from "@/hooks/useEarningsData";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface StockPriceChartProps {
   data: MonthlyPrice[] | undefined;
@@ -26,6 +27,8 @@ const formatVolume = (v: number) => {
 
 const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps) => {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
+
   if (isLoading) {
     return <Skeleton className="h-[300px] w-full rounded-lg" />;
   }
@@ -33,7 +36,7 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
   if (!data || data.length === 0) {
     return (
       <p className="text-sm text-muted-foreground font-mono py-8 text-center">
-        No price data available
+        {t("chart.noPriceData")}
       </p>
     );
   }
@@ -100,27 +103,14 @@ const StockPriceChart = ({ data, isLoading, companyName }: StockPriceChartProps)
             labelStyle={{ color: "hsl(var(--primary))", fontWeight: 600 }}
             formatter={(value: number, name: string) =>
               name === "close"
-                ? [`$${value.toFixed(2)}`, "Close"]
-                : [formatVolume(value), "Volume"]
+                ? [`$${value.toFixed(2)}`, t("chart.close")]
+                : [formatVolume(value), t("chart.volume")]
             }
           />
           {!isMobile && (
-            <Bar
-              yAxisId="volume"
-              dataKey="volume"
-              fill="hsl(200, 90%, 50%)"
-              opacity={0.2}
-              barSize={6}
-            />
+            <Bar yAxisId="volume" dataKey="volume" fill="hsl(200, 90%, 50%)" opacity={0.2} barSize={6} />
           )}
-          <Area
-            yAxisId="price"
-            type="monotone"
-            dataKey="close"
-            stroke="hsl(160, 100%, 45%)"
-            strokeWidth={2}
-            fill="url(#priceGradient)"
-          />
+          <Area yAxisId="price" type="monotone" dataKey="close" stroke="hsl(160, 100%, 45%)" strokeWidth={2} fill="url(#priceGradient)" />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

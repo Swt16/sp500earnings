@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sparkles } from "lucide-react";
 import type { EarningsEntry } from "@/data/earningsData";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AISummaryProps {
   ticker: string;
@@ -13,6 +14,7 @@ interface AISummaryProps {
 }
 
 const AISummary = ({ ticker, companyName, earningsData }: AISummaryProps) => {
+  const { t } = useLanguage();
   const [summary, setSummary] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lastTicker, setLastTicker] = useState<string | null>(null);
@@ -41,13 +43,9 @@ const AISummary = ({ ticker, companyName, earningsData }: AISummaryProps) => {
   return (
     <div className="space-y-3">
       {(!summary || needsRefresh) && !isLoading && (
-        <Button
-          onClick={generate}
-          variant="outline"
-          className="font-mono text-xs gap-2"
-        >
+        <Button onClick={generate} variant="outline" className="font-mono text-xs gap-2">
           <Sparkles className="h-3.5 w-3.5" />
-          Generate AI Analysis
+          {t("ai.generate")}
         </Button>
       )}
 
@@ -65,14 +63,9 @@ const AISummary = ({ ticker, companyName, earningsData }: AISummaryProps) => {
           <div className="text-sm text-foreground leading-relaxed whitespace-pre-line">
             {summary}
           </div>
-          <Button
-            onClick={generate}
-            variant="ghost"
-            size="sm"
-            className="font-mono text-xs gap-1.5 text-muted-foreground"
-          >
+          <Button onClick={generate} variant="ghost" size="sm" className="font-mono text-xs gap-1.5 text-muted-foreground">
             <Sparkles className="h-3 w-3" />
-            Regenerate
+            {t("ai.regenerate")}
           </Button>
         </div>
       )}

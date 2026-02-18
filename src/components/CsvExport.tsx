@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import type { EarningsEntry } from "@/data/earningsData";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CsvExportProps {
   data: EarningsEntry[];
@@ -8,6 +9,8 @@ interface CsvExportProps {
 }
 
 const CsvExport = ({ data, ticker }: CsvExportProps) => {
+  const { t } = useLanguage();
+
   const exportCsv = () => {
     const headers = ["Quarter", "Revenue ($B)", "EPS ($)", "Net Income ($B)", "CapEx ($B)", "Gross Margin (%)", "Operating Margin (%)"];
     const rows = [...data].reverse().map((d) => [
@@ -31,14 +34,9 @@ const CsvExport = ({ data, ticker }: CsvExportProps) => {
   };
 
   return (
-    <Button
-      onClick={exportCsv}
-      variant="outline"
-      size="sm"
-      className="font-mono text-xs gap-1.5"
-    >
+    <Button onClick={exportCsv} variant="outline" size="sm" className="font-mono text-xs gap-1.5">
       <Download className="h-3.5 w-3.5" />
-      Export CSV
+      {t("export.csv")}
     </Button>
   );
 };
