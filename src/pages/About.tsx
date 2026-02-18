@@ -37,7 +37,7 @@ const About = () => {
         <section className="space-y-3">
           <h2 className="text-lg font-mono font-semibold text-primary">Caching</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            To stay within Alpha Vantage's rate limits, fetched data is cached in the backend for 24 hours. Subsequent requests for the same company serve cached data instantly.
+            To stay within Alpha Vantage's rate limits, fetched data is cached in the backend for 7 days. Subsequent requests for the same company serve cached data instantly.
           </p>
         </section>
 
