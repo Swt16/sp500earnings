@@ -75,17 +75,39 @@ function adjustForSplits(ticker: string, entries: { date: string; close: number;
   });
 }
 
-async function fetchAV(fn: string, symbol: string, apiKey: string) {
+async function fetchAV(fn: string, symbol: string, apiKey: string, retries = 3) {
   const url = `${AV_BASE}?function=${fn}&symbol=${symbol}&apikey=${apiKey}`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Alpha Vantage error [${res.status}]: ${text}`);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const res = await fetch(url);
+
+    // Retry on 5xx errors
+    if (res.status >= 500 && attempt < retries) {
+      console.warn(`Alpha Vantage returned ${res.status} for ${fn}, retry ${attempt}/${retries}...`);
+      await new Promise(r => setTimeout(r, 2000 * attempt));
+      continue;
+    }
+
+    // Validate content-type before parsing
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      if (text.trim().startsWith('<!') || text.includes('<html')) {
+        throw new Error(`Alpha Vantage returned HTML (status ${res.status}). The API may be temporarily unavailable. Please try again later.`);
+      }
+      throw new Error(`Alpha Vantage unexpected response format: ${contentType}, status ${res.status}`);
+    }
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Alpha Vantage error [${res.status}]: ${text}`);
+    }
+
+    const raw = await res.json();
+    if (raw['Note'] || raw['Information']) throw new Error(raw['Note'] || raw['Information']);
+    if (raw['Error Message']) throw new Error(raw['Error Message']);
+    return raw;
   }
-  const raw = await res.json();
-  if (raw['Note'] || raw['Information']) throw new Error(raw['Note'] || raw['Information']);
-  if (raw['Error Message']) throw new Error(raw['Error Message']);
-  return raw;
+  throw new Error('Alpha Vantage API is temporarily unavailable after multiple retries. Please try again later.');
 }
 
 function buildEntries(incomeRaw: any, earningsRaw: any, cashFlowRaw: any) {
