@@ -201,6 +201,8 @@ Deno.serve(async (req) => {
 
     if (action === 'earnings' && ticker) {
       const upperTicker = ticker.toUpperCase();
+      // Alpha Vantage uses hyphens for share class tickers (e.g. BRK-B, BF-B)
+      const avTicker = upperTicker.replace('.', '-');
       const pricesCacheKey = `${upperTicker}_PRICES`;
 
       // Check earnings cache
@@ -234,11 +236,11 @@ Deno.serve(async (req) => {
 
       // Fetch earnings if stale
       if (!entries) {
-        const incomeRaw = await fetchAV('INCOME_STATEMENT', ticker, apiKey);
+        const incomeRaw = await fetchAV('INCOME_STATEMENT', avTicker, apiKey);
         await new Promise(resolve => setTimeout(resolve, 1200));
-        const earningsRaw = await fetchAV('EARNINGS', ticker, apiKey);
+        const earningsRaw = await fetchAV('EARNINGS', avTicker, apiKey);
         await new Promise(resolve => setTimeout(resolve, 1200));
-        const cashFlowRaw = await fetchAV('CASH_FLOW', ticker, apiKey);
+        const cashFlowRaw = await fetchAV('CASH_FLOW', avTicker, apiKey);
 
         entries = buildEntries(incomeRaw, earningsRaw, cashFlowRaw);
 
@@ -254,7 +256,7 @@ Deno.serve(async (req) => {
           // We just made API calls above, add delay
           await new Promise(resolve => setTimeout(resolve, 1200));
         }
-        const raw = await fetchAV('TIME_SERIES_MONTHLY', ticker, apiKey);
+        const raw = await fetchAV('TIME_SERIES_MONTHLY', avTicker, apiKey);
         const monthly = raw['Monthly Time Series'];
         if (monthly) {
           const rawEntries = Object.entries(monthly)
