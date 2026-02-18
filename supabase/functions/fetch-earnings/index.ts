@@ -217,9 +217,9 @@ Deno.serve(async (req) => {
         .eq('ticker', pricesCacheKey)
         .single();
 
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-      const earningsFresh = cachedEarnings && (Date.now() - new Date(cachedEarnings.fetched_at).getTime() < ONE_DAY);
-      const pricesFresh = cachedPrices && (Date.now() - new Date(cachedPrices.fetched_at).getTime() < ONE_DAY);
+      const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+      const earningsFresh = cachedEarnings && (Date.now() - new Date(cachedEarnings.fetched_at).getTime() < SEVEN_DAYS);
+      const pricesFresh = cachedPrices && (Date.now() - new Date(cachedPrices.fetched_at).getTime() < SEVEN_DAYS);
 
       // If both are cached, return immediately
       if (earningsFresh && pricesFresh) {
