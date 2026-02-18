@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -14,6 +14,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CompanyOption {
   ticker: string;
@@ -27,6 +28,7 @@ interface CompanySearchProps {
 }
 
 const CompanySearch = ({ companies, value, onSelect }: CompanySearchProps) => {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const selected = companies.find((c) => c.ticker === value);
 
@@ -39,7 +41,7 @@ const CompanySearch = ({ companies, value, onSelect }: CompanySearchProps) => {
           className="w-[280px] flex items-center justify-between px-3 py-2 rounded-md border border-border bg-card font-mono text-sm text-foreground hover:bg-secondary/50 transition-colors"
         >
           <span className="truncate">
-            {selected ? `${selected.ticker} — ${selected.name}` : "Select company..."}
+            {selected ? `${selected.ticker} — ${selected.name}` : t("search.select")}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
         </button>
@@ -47,12 +49,12 @@ const CompanySearch = ({ companies, value, onSelect }: CompanySearchProps) => {
       <PopoverContent className="w-[280px] p-0 bg-popover border-border z-50" align="start">
         <Command>
           <CommandInput
-            placeholder="Search ticker or name..."
+            placeholder={t("search.placeholder")}
             className="font-mono text-sm"
           />
           <CommandList className="max-h-[300px]">
             <CommandEmpty className="py-3 text-center text-sm text-muted-foreground font-mono">
-              No company found.
+              {t("search.empty")}
             </CommandEmpty>
             <CommandGroup>
               {companies.map((c) => (

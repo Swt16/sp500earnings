@@ -1,55 +1,56 @@
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const About = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <a href="/" className="text-xl font-mono font-bold text-primary tracking-tight hover:underline">
-            EARNINGS TERMINAL
+            {t("app.title")}
           </a>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
-        <h1 className="text-3xl font-mono font-bold text-foreground">About This Project</h1>
+        <h1 className="text-3xl font-mono font-bold text-foreground">{t("about.title")}</h1>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-mono font-semibold text-primary">What It Does</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Earnings Terminal is an interactive dashboard for exploring quarterly financial data across S&P 500 companies. It visualizes revenue, EPS, net income, capital expenditure, margins, and stock price trends — all in one place.
-          </p>
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.whatTitle")}</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("about.whatDesc")}</p>
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-mono font-semibold text-primary">Data Sources</h2>
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.dataTitle")}</h2>
           <ul className="text-sm text-muted-foreground leading-relaxed list-disc pl-5 space-y-1.5">
             <li>
-              <strong className="text-foreground">S&P 500 companies</strong> — Live data fetched from the Alpha Vantage API on demand.
+              <strong className="text-foreground">{t("about.dataCompanies")}</strong> — {t("about.dataCompaniesDesc")}
             </li>
             <li>
-              <strong className="text-foreground">Stock prices</strong> — Monthly adjusted close prices, also from Alpha Vantage.
+              <strong className="text-foreground">{t("about.dataPrice")}</strong> — {t("about.dataPriceDesc")}
             </li>
           </ul>
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-mono font-semibold text-primary">Caching</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            To stay within Alpha Vantage's rate limits, fetched data is cached in the backend for 7 days. Subsequent requests for the same company serve cached data instantly.
-          </p>
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.cacheTitle")}</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("about.cacheDesc")}</p>
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-mono font-semibold text-primary">AI Analysis</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            The "AI Earnings Analysis" feature sends the most recent quarters of financial data to an AI model, which generates a plain-English summary of trends. It does <strong className="text-foreground">not</strong> pull from earnings call transcripts, news, or investor relations websites — the analysis is based solely on the numerical data shown in the dashboard.
-          </p>
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.aiTitle")}</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("about.aiDesc")}</p>
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-mono font-semibold text-primary">Tech Stack</h2>
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.techTitle")}</h2>
           <ul className="text-sm text-muted-foreground leading-relaxed list-disc pl-5 space-y-1.5">
             <li>React + TypeScript + Vite</li>
             <li>Tailwind CSS + shadcn/ui</li>
@@ -60,7 +61,7 @@ const About = () => {
 
         <div className="pt-4 border-t border-border">
           <a href="/" className="text-sm font-mono text-primary hover:underline">
-            ← Back to Terminal
+            {t("about.backLink")}
           </a>
         </div>
       </main>

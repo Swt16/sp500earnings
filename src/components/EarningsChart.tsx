@@ -8,9 +8,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import type { EarningsEntry } from "@/data/earningsData";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EarningsChartProps {
   data: EarningsEntry[];
@@ -19,18 +19,19 @@ interface EarningsChartProps {
 
 type MetricKey = "revenue" | "eps" | "netIncome" | "capex";
 
-const metrics: { key: MetricKey; label: string; color: string }[] = [
-  { key: "revenue", label: "Revenue ($B)", color: "hsl(160, 100%, 45%)" },
-  { key: "eps", label: "EPS ($)", color: "hsl(200, 90%, 50%)" },
-  { key: "netIncome", label: "Net Income ($B)", color: "hsl(45, 100%, 55%)" },
-  { key: "capex", label: "CapEx ($B)", color: "hsl(280, 80%, 60%)" },
-];
-
 const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
   const [activeMetrics, setActiveMetrics] = useState<Set<MetricKey>>(
     new Set(["revenue"])
   );
+
+  const metrics: { key: MetricKey; label: string; color: string }[] = [
+    { key: "revenue", label: t("metric.revenue"), color: "hsl(160, 100%, 45%)" },
+    { key: "eps", label: t("metric.eps"), color: "hsl(200, 90%, 50%)" },
+    { key: "netIncome", label: t("metric.netIncome"), color: "hsl(45, 100%, 55%)" },
+    { key: "capex", label: t("metric.capex"), color: "hsl(280, 80%, 60%)" },
+  ];
 
   const toggleMetric = (key: MetricKey) => {
     setActiveMetrics((prev) => {
@@ -78,7 +79,7 @@ const EarningsChart = ({ data, companyName }: EarningsChartProps) => {
       <div className={`${isMobile ? 'h-[280px]' : 'h-[350px]'} w-full`}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 5, right: isMobile ? 5 : 20, left: isMobile ? 0 : 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="[&>line]:stroke-border" stroke="hsl(var(--border))" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis
               dataKey="quarter"
               tick={{ fill: "hsl(var(--muted-foreground))", fontSize: isMobile ? 9 : 11, fontFamily: "JetBrains Mono" }}

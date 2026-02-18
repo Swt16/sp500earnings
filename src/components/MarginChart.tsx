@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import type { EarningsEntry } from "@/data/earningsData";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface MarginChartProps {
   data: EarningsEntry[];
@@ -18,6 +19,7 @@ interface MarginChartProps {
 
 const MarginChart = ({ data, companyName }: MarginChartProps) => {
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
 
   const chartData = data.map((d) => ({
     quarter: d.quarter,
@@ -25,11 +27,10 @@ const MarginChart = ({ data, companyName }: MarginChartProps) => {
     operatingMargin: d.operatingMargin ?? 0,
   }));
 
-  // Don't render if no margin data
   if (chartData.every((d) => d.grossMargin === 0 && d.operatingMargin === 0)) {
     return (
       <p className="text-sm text-muted-foreground font-mono py-8 text-center">
-        No margin data available
+        {t("chart.noMarginData")}
       </p>
     );
   }
@@ -39,11 +40,11 @@ const MarginChart = ({ data, companyName }: MarginChartProps) => {
       <div className="flex gap-4 mb-3">
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-0.5 rounded" style={{ backgroundColor: "hsl(160, 100%, 45%)" }} />
-          <span className="text-xs font-mono text-muted-foreground">Gross Margin %</span>
+          <span className="text-xs font-mono text-muted-foreground">{t("metric.grossMargin")}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-3 h-0.5 rounded" style={{ backgroundColor: "hsl(45, 100%, 55%)" }} />
-          <span className="text-xs font-mono text-muted-foreground">Operating Margin %</span>
+          <span className="text-xs font-mono text-muted-foreground">{t("metric.operatingMargin")}</span>
         </div>
       </div>
       <ResponsiveContainer width="100%" height="100%">
@@ -79,27 +80,11 @@ const MarginChart = ({ data, companyName }: MarginChartProps) => {
             labelStyle={{ color: "hsl(var(--primary))", fontWeight: 600 }}
             formatter={(value: number, name: string) => [
               `${value.toFixed(1)}%`,
-              name === "grossMargin" ? "Gross Margin" : "Operating Margin",
+              name === "grossMargin" ? t("metric.grossMarginShort") : t("metric.operatingMarginShort"),
             ]}
           />
-          <Line
-            type="monotone"
-            dataKey="grossMargin"
-            stroke="hsl(160, 100%, 45%)"
-            strokeWidth={2}
-            dot={{ r: 3, fill: "hsl(160, 100%, 45%)" }}
-            activeDot={{ r: 5 }}
-            name="grossMargin"
-          />
-          <Line
-            type="monotone"
-            dataKey="operatingMargin"
-            stroke="hsl(45, 100%, 55%)"
-            strokeWidth={2}
-            dot={{ r: 3, fill: "hsl(45, 100%, 55%)" }}
-            activeDot={{ r: 5 }}
-            name="operatingMargin"
-          />
+          <Line type="monotone" dataKey="grossMargin" stroke="hsl(160, 100%, 45%)" strokeWidth={2} dot={{ r: 3, fill: "hsl(160, 100%, 45%)" }} activeDot={{ r: 5 }} name="grossMargin" />
+          <Line type="monotone" dataKey="operatingMargin" stroke="hsl(45, 100%, 55%)" strokeWidth={2} dot={{ r: 3, fill: "hsl(45, 100%, 55%)" }} activeDot={{ r: 5 }} name="operatingMargin" />
         </LineChart>
       </ResponsiveContainer>
     </div>

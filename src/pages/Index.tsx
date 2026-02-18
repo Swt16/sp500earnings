@@ -5,6 +5,7 @@ import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCompanyEarnings } from "@/hooks/useEarningsData";
 import ThemeToggle from "@/components/ThemeToggle";
+import LanguageToggle from "@/components/LanguageToggle";
 import EarningsTable from "@/components/EarningsTable";
 import EarningsChart from "@/components/EarningsChart";
 import MarginChart from "@/components/MarginChart";
@@ -20,10 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const sectors = Array.from(new Set(sp500Companies.map((c) => c.sector))).sort();
 
 const Index = () => {
+  const { t } = useLanguage();
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
   const [selectedQuarter, setSelectedQuarter] = useState<string>("all");
   const [sectorFilter, setSectorFilter] = useState<string>("all");
@@ -51,19 +54,20 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-mono font-bold text-primary tracking-tight">
-              EARNINGS TERMINAL
+              {t("app.title")}
             </h1>
             <p className="text-xs font-mono text-muted-foreground mt-0.5">
-              S&P 500 Quarterly Data · Live
+              {t("app.subtitle")}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <a href="/about" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
-              About
+              {t("nav.about")}
             </a>
             <a href="/share" className="text-xs font-mono text-muted-foreground hover:text-primary transition-colors">
-              Share
+              {t("nav.share")}
             </a>
+            <LanguageToggle />
             <ThemeToggle />
           </div>
         </div>
@@ -74,14 +78,14 @@ const Index = () => {
         <div className="flex flex-wrap gap-4 items-end">
           <div className="space-y-1.5">
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-              Sector
+              {t("label.sector")}
             </label>
             <Select value={sectorFilter} onValueChange={setSectorFilter}>
               <SelectTrigger className="w-[200px] font-mono bg-card border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border max-h-[300px]">
-                <SelectItem value="all" className="font-mono">All Sectors</SelectItem>
+                <SelectItem value="all" className="font-mono">{t("select.allSectors")}</SelectItem>
                 {sectors.map((s) => (
                   <SelectItem key={s} value={s} className="font-mono">{s}</SelectItem>
                 ))}
@@ -91,7 +95,7 @@ const Index = () => {
 
           <div className="space-y-1.5">
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-              Company
+              {t("label.company")}
             </label>
             <CompanySearch
               companies={filteredCompanies}
@@ -102,14 +106,14 @@ const Index = () => {
 
           <div className="space-y-1.5">
             <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-              Quarter
+              {t("label.quarter")}
             </label>
             <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
               <SelectTrigger className="w-[180px] font-mono bg-card border-border">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border max-h-[300px]">
-                <SelectItem value="all" className="font-mono">All Quarters</SelectItem>
+                <SelectItem value="all" className="font-mono">{t("select.allQuarters")}</SelectItem>
                 {availableQuarters.map((q) => (
                   <SelectItem key={q} value={q} className="font-mono">{q}</SelectItem>
                 ))}
@@ -119,7 +123,7 @@ const Index = () => {
 
           <Button variant="outline" size="sm" onClick={selectRandom} className="font-mono">
             <Shuffle className="h-4 w-4 mr-1" />
-            Random
+            {t("btn.random")}
           </Button>
 
           <div className="ml-auto flex items-center gap-3">
@@ -155,51 +159,46 @@ const Index = () => {
         {/* Error state */}
         {isError && !earningsData && (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-5 text-sm text-destructive font-mono">
-            Failed to load earnings data for {selectedTicker}. The daily API request limit may have been reached. Try again tomorrow or select a previously loaded company.
+            {t("error.loadFailed")} {selectedTicker}. {t("error.apiLimit")}
           </div>
         )}
 
         {earningsData && (
           <>
-            {/* Chart */}
             <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
-                Trend Analysis
+                {t("section.trendAnalysis")}
               </h2>
               <EarningsChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
-            {/* Margin Trends */}
             <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
-                Margin Trends
+                {t("section.marginTrends")}
               </h2>
               <MarginChart data={earningsData} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
-            {/* Stock Price Chart */}
             <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
-                Monthly Stock Price
+                {t("section.stockPrice")}
               </h2>
               <StockPriceChart data={priceData} isLoading={priceLoading} companyName={selectedCompany?.name ?? selectedTicker} />
             </div>
 
-            {/* Table with Export */}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider">
-                  Financial Data
+                  {t("section.financialData")}
                 </h2>
                 <CsvExport data={earningsData} ticker={selectedTicker} />
               </div>
               <EarningsTable data={earningsData} selectedQuarter={quarterFilter} />
             </div>
 
-            {/* AI Summary */}
             <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                AI Earnings Analysis
+                {t("section.aiAnalysis")}
               </h2>
               <AISummary
                 ticker={selectedTicker}
@@ -208,11 +207,10 @@ const Index = () => {
               />
             </div>
 
-            {/* Summary */}
             {quarterFilter ? (
               <div className="rounded-lg border border-border bg-card p-5">
                 <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                  Quarter Summary — {quarterFilter}
+                  {t("section.quarterSummary")} — {quarterFilter}
                 </h2>
                 <p className="text-sm text-foreground leading-relaxed">
                   {earningsData.find((d) => d.quarter === quarterFilter)?.summary}
@@ -221,7 +219,7 @@ const Index = () => {
             ) : (
               <div className="rounded-lg border border-border bg-card p-5">
                 <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                  Recent Quarter Summaries
+                  {t("section.recentSummaries")}
                 </h2>
                 <div className="space-y-3">
                   {earningsData
