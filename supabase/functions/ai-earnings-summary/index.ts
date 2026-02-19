@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { ticker, companyName, earningsData } = await req.json();
+    const { ticker, companyName, earningsData, language } = await req.json();
 
     // Validate ticker
     if (!ticker || typeof ticker !== 'string' || !/^[A-Z]{1,5}$/i.test(ticker)) {
@@ -48,13 +48,17 @@ Deno.serve(async (req) => {
       `${q.quarter}: Revenue $${q.revenue}B, EPS $${q.eps}, Net Income $${q.netIncome}B, CapEx $${q.capex ?? 0}B, Gross Margin ${q.grossMargin ?? 'N/A'}%, Op Margin ${q.operatingMargin ?? 'N/A'}%`
     ).join('\n');
 
-    const systemPrompt = `You are a concise financial analyst writing for a college-level audience. Given quarterly earnings data, write a 3-4 paragraph plain-English analysis covering:
+    const langInstruction = language === 'zh'
+      ? 'Write the entire analysis in Simplified Chinese (简体中文).'
+      : 'Write the analysis in English.';
+
+    const systemPrompt = `You are a concise financial analyst writing for a college-level audience. Given quarterly earnings data, write a 3-4 paragraph analysis covering:
 1. Revenue trajectory and growth trends
 2. Profitability (margins, EPS trends)
 3. Notable patterns or inflection points
 4. Brief forward-looking commentary based on trends
 
-Use specific numbers from the data. Keep it under 250 words. Do not use bullet points. Write in a professional but accessible tone.`;
+Use specific numbers from the data. Keep it under 250 words. Do not use bullet points. Write in a professional but accessible tone. ${langInstruction}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

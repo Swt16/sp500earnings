@@ -14,7 +14,7 @@ interface AISummaryProps {
 }
 
 const AISummary = ({ ticker, companyName, earningsData }: AISummaryProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [summary, setSummary] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lastTicker, setLastTicker] = useState<string | null>(null);
@@ -24,7 +24,7 @@ const AISummary = ({ ticker, companyName, earningsData }: AISummaryProps) => {
     setSummary(null);
     try {
       const { data, error } = await supabase.functions.invoke("ai-earnings-summary", {
-        body: { ticker, companyName, earningsData },
+        body: { ticker, companyName, earningsData, language },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
