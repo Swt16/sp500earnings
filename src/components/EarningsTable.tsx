@@ -58,7 +58,7 @@ const EarningsTable = ({ data, selectedQuarter }: EarningsTableProps) => {
                 <span className={entry.netIncome < 0 ? "text-destructive" : ""}>{fmt(entry.netIncome)}</span>
               </TableCell>
               <TableCell className="font-mono text-sm text-right text-foreground">{fmt(entry.capex ?? 0)}</TableCell>
-              <TableCell className="font-mono text-sm text-right text-foreground">{(entry.grossMargin ?? 0).toFixed(1)}%</TableCell>
+              <TableCell className="font-mono text-sm text-right text-foreground">{(entry.grossMargin ?? 0) >= 100 ? "N/A" : `${(entry.grossMargin ?? 0).toFixed(1)}%`}</TableCell>
               <TableCell className="font-mono text-sm text-right text-foreground">{(entry.operatingMargin ?? 0).toFixed(1)}%</TableCell>
             </TableRow>
           ))}

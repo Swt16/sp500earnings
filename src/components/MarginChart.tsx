@@ -21,9 +21,11 @@ const MarginChart = ({ data, companyName }: MarginChartProps) => {
   const isMobile = useIsMobile();
   const { t } = useLanguage();
 
+  const hasAllMaxGrossMargin = data.every((d) => (d.grossMargin ?? 0) >= 100);
+
   const chartData = data.map((d) => ({
     quarter: d.quarter,
-    grossMargin: d.grossMargin ?? 0,
+    grossMargin: hasAllMaxGrossMargin ? null : (d.grossMargin ?? 0),
     operatingMargin: d.operatingMargin ?? 0,
   }));
 
