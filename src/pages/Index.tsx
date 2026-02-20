@@ -207,35 +207,6 @@ const Index = () => {
               />
             </div>
 
-            {quarterFilter ? (
-              <div className="rounded-lg border border-border bg-card p-5">
-                <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                  {t("section.quarterSummary")} — {quarterFilter}
-                </h2>
-                <p className="text-sm text-foreground leading-relaxed">
-                  {earningsData.find((d) => d.quarter === quarterFilter)?.summary}
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-lg border border-border bg-card p-5">
-                <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                  {t("section.recentSummaries")}
-                </h2>
-                <div className="space-y-3">
-                  {earningsData
-                    .slice(-4)
-                    .reverse()
-                    .map((entry) => (
-                      <div key={entry.quarter} className="border-l-2 border-primary/30 pl-4">
-                        <p className="text-xs font-mono text-primary mb-1">{entry.quarter}</p>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {entry.summary}
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
           </>
         )}
       </main>
