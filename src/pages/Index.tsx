@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { allQuarters } from "@/data/earningsData";
 import { sp500Companies } from "@/data/sp500Companies";
 import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const sectors = Array.from(new Set(sp500Companies.map((c) => c.sector))).sort();
 const Index = () => {
   const { t } = useLanguage();
   const [selectedTicker, setSelectedTicker] = useState("AAPL");
-  const [selectedQuarter, setSelectedQuarter] = useState<string>("all");
+  
   const [sectorFilter, setSectorFilter] = useState<string>("all");
 
   const selectRandom = useCallback(() => {
@@ -45,8 +44,7 @@ const Index = () => {
     : sp500Companies.filter((c) => c.sector === sectorFilter);
 
   const selectedCompany = sp500Companies.find((c) => c.ticker === selectedTicker);
-  const quarterFilter = selectedQuarter === "all" ? null : selectedQuarter;
-  const availableQuarters = earningsData?.map((d) => d.quarter) ?? allQuarters;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,22 +102,8 @@ const Index = () => {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-              {t("label.quarter")}
-            </label>
-            <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-              <SelectTrigger className="w-[180px] font-mono bg-card border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border max-h-[300px]">
-                <SelectItem value="all" className="font-mono">{t("select.allQuarters")}</SelectItem>
-                {availableQuarters.map((q) => (
-                  <SelectItem key={q} value={q} className="font-mono">{q}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+
+
 
           <Button variant="outline" size="sm" onClick={selectRandom} className="font-mono">
             <Shuffle className="h-4 w-4 mr-1" />
@@ -193,7 +177,7 @@ const Index = () => {
                 </h2>
                 <CsvExport data={earningsData} ticker={selectedTicker} />
               </div>
-              <EarningsTable data={earningsData} selectedQuarter={quarterFilter} />
+              <EarningsTable data={earningsData} selectedQuarter={null} />
             </div>
 
             <div className="rounded-lg border border-border bg-card p-5">
