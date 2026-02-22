@@ -26,6 +26,7 @@ const translations = {
   "section.stockPrice": { en: "Monthly Stock Price", zh: "月度股价" },
   "section.financialData": { en: "Financial Data", zh: "财务数据" },
   "section.aiAnalysis": { en: "AI Earnings Analysis", zh: "AI 财报分析" },
+  "section.earningsCallInsights": { en: "Latest Earnings Call Insights", zh: "最新财报电话会议洞察" },
   "section.quarterSummary": { en: "Quarter Summary", zh: "季度摘要" },
   "section.recentSummaries": { en: "Recent Quarter Summaries", zh: "近期季度摘要" },
 
@@ -63,6 +64,8 @@ const translations = {
   // AI Summary
   "ai.generate": { en: "Generate AI Analysis", zh: "生成 AI 分析" },
   "ai.regenerate": { en: "Regenerate", zh: "重新生成" },
+  "insights.generate": { en: "Generate Earnings Call Insights", zh: "生成财报电话会议洞察" },
+  "insights.disclaimer": { en: "Based on AI knowledge — may not reflect the very latest earnings call.", zh: "基于 AI 知识——可能不反映最新的财报电话会议。" },
 
   // CSV Export
   "export.csv": { en: "Export CSV", zh: "导出 CSV" },

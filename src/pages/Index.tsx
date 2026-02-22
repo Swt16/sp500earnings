@@ -11,6 +11,7 @@ import MarginChart from "@/components/MarginChart";
 import StockPriceChart from "@/components/StockPriceChart";
 import CompanySearch from "@/components/CompanySearch";
 import AISummary from "@/components/AISummary";
+import EarningsCallInsights from "@/components/EarningsCallInsights";
 import CsvExport from "@/components/CsvExport";
 import {
   Select,
@@ -157,6 +158,16 @@ const Index = () => {
                 ticker={selectedTicker}
                 companyName={selectedCompany?.name ?? selectedTicker}
                 earningsData={earningsData}
+              />
+            </div>
+
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                {t("section.earningsCallInsights")}
+              </h2>
+              <EarningsCallInsights
+                ticker={selectedTicker}
+                companyName={selectedCompany?.name ?? selectedTicker}
               />
             </div>
 
