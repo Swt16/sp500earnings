@@ -87,6 +87,8 @@ const translations = {
   "about.cacheDesc": { en: "To stay within Alpha Vantage's rate limits, fetched data is cached in the backend for 7 days. Subsequent requests for the same company serve cached data instantly.", zh: "为遵守 Alpha Vantage 的速率限制，获取的数据在后端缓存7天。对同一公司的后续请求将立即返回缓存数据。" },
   "about.aiTitle": { en: "AI Analysis", zh: "AI 分析" },
   "about.aiDesc": { en: 'The "AI Earnings Analysis" feature sends the most recent quarters of financial data to an AI model, which generates a plain-English summary of trends. It does not pull from earnings call transcripts, news, or investor relations websites — the analysis is based solely on the numerical data shown in the dashboard.', zh: '"AI 财报分析"功能将最近几个季度的财务数据发送给 AI 模型，生成趋势的中文摘要。该功能不会从财报电话会议记录、新闻或投资者关系网站获取信息——分析完全基于仪表盘中显示的数值数据。' },
+  "about.insightsTitle": { en: "Latest Earnings Call Insights", zh: "最新财报电话会议洞察" },
+  "about.insightsDesc": { en: 'The "Latest Earnings Call Insights" feature uses AI to generate a summary of the company\'s most recent earnings call, covering key management commentary, forward guidance, analyst Q&A highlights, and strategic initiatives. The insights are based on the AI model\'s training data and may not reflect the very latest earnings call if it occurred recently.', zh: '"最新财报电话会议洞察"功能使用 AI 生成公司最近一次财报电话会议的摘要，涵盖管理层关键评论、前瞻性指引、分析师问答亮点和战略举措。洞察基于 AI 模型的训练数据，如果最近刚发生的电话会议可能尚未反映。' },
   "about.techTitle": { en: "Tech Stack", zh: "技术栈" },
   "about.backLink": { en: "← Back to Terminal", zh: "← 返回终端" },
 
