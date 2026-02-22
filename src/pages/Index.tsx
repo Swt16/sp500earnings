@@ -150,6 +150,17 @@ const Index = () => {
         {earningsData && (
           <>
             <div className="rounded-lg border border-border bg-card p-5">
+              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
+                {t("section.aiAnalysis")}
+              </h2>
+              <AISummary
+                ticker={selectedTicker}
+                companyName={selectedCompany?.name ?? selectedTicker}
+                earningsData={earningsData}
+              />
+            </div>
+
+            <div className="rounded-lg border border-border bg-card p-5">
               <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4">
                 {t("section.trendAnalysis")}
               </h2>
@@ -179,18 +190,6 @@ const Index = () => {
               </div>
               <EarningsTable data={earningsData} selectedQuarter={null} />
             </div>
-
-            <div className="rounded-lg border border-border bg-card p-5">
-              <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-3">
-                {t("section.aiAnalysis")}
-              </h2>
-              <AISummary
-                ticker={selectedTicker}
-                companyName={selectedCompany?.name ?? selectedTicker}
-                earningsData={earningsData}
-              />
-            </div>
-
           </>
         )}
       </main>
