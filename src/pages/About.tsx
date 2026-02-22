@@ -50,6 +50,11 @@ const About = () => {
         </section>
 
         <section className="space-y-3">
+          <h2 className="text-lg font-mono font-semibold text-primary">{t("about.insightsTitle")}</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("about.insightsDesc")}</p>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-lg font-mono font-semibold text-primary">{t("about.techTitle")}</h2>
           <ul className="text-sm text-muted-foreground leading-relaxed list-disc pl-5 space-y-1.5">
             <li>React + TypeScript + Vite</li>
