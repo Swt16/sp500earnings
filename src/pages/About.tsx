@@ -64,7 +64,8 @@ const About = () => {
           </ul>
         </section>
 
-        <div className="pt-4 border-t border-border">
+        <div className="pt-4 border-t border-border space-y-4">
+          <p className="text-xs text-muted-foreground leading-relaxed">{t("disclaimer")}</p>
           <a href="/" className="text-sm font-mono text-primary hover:underline">
             {t("about.backLink")}
           </a>

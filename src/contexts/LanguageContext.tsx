@@ -97,6 +97,9 @@ const translations = {
   "share.scanDesc": { en: "Scan the QR code below to open Earnings Terminal on any device.", zh: "扫描下方二维码，在任意设备上打开财报终端。" },
   "share.backLink": { en: "← Back to Terminal", zh: "← 返回终端" },
 
+  // Disclaimer
+  "disclaimer": { en: "This tool is for informational and research purposes only. It does not constitute financial advice, investment recommendations, or an offer to buy or sell securities. Data may be delayed, incomplete, or inaccurate. Always consult a qualified financial advisor before making investment decisions.", zh: "本工具仅供信息和研究用途，不构成财务建议、投资推荐或买卖证券的要约。数据可能存在延迟、不完整或不准确的情况。在做出投资决策前，请务必咨询合格的财务顾问。" },
+
   // 404 page
   "notFound.title": { en: "404", zh: "404" },
   "notFound.message": { en: "Oops! Page not found", zh: "糟糕！页面未找到" },

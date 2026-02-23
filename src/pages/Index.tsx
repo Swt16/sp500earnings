@@ -203,6 +203,10 @@ const Index = () => {
             </div>
           </>
         )}
+
+        <footer className="border-t border-border pt-4 pb-2">
+          <p className="text-xs text-muted-foreground leading-relaxed">{t("disclaimer")}</p>
+        </footer>
       </main>
     </div>
   );
