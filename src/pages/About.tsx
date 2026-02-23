@@ -66,7 +66,7 @@ const About = () => {
 
         <section className="space-y-3">
           <h2 className="text-lg font-mono font-semibold text-primary">{t("about.disclaimerTitle")}</h2>
-          <p className="text-xs text-muted-foreground leading-relaxed">{t("disclaimer")}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t("disclaimer")}</p>
         </section>
 
         <div className="pt-4 border-t border-border">
