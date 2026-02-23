@@ -77,7 +77,7 @@ const translations = {
   // About page
   "about.title": { en: "About This Project", zh: "关于本项目" },
   "about.whatTitle": { en: "What It Does", zh: "功能介绍" },
-  "about.whatDesc": { en: "Earnings Terminal is an interactive dashboard for exploring quarterly financial data across S&P 500 companies. It visualizes revenue, EPS, net income, capital expenditure, margins, and stock price trends — all in one place.", zh: "财报终端是一个互动仪表盘，可浏览标普500公司的季度财务数据。集营收、每股收益、净利润、资本支出、利润率和股价趋势于一体。" },
+  "about.whatDesc": { en: "Earnings Terminal is an interactive dashboard for exploring quarterly financial data across S&P 500 companies. It visualizes revenue, EPS, net income, capital expenditure, free cash flow (FCF), year-over-year revenue growth, margins, and stock price trends — all in one place.", zh: "财报终端是一个互动仪表盘，可浏览标普500公司的季度财务数据。集营收、每股收益、净利润、资本支出、自由现金流（FCF）、同比营收增长、利润率和股价趋势于一体。" },
   "about.dataTitle": { en: "Data Sources", zh: "数据来源" },
   "about.dataCompanies": { en: "S&P 500 companies", zh: "标普500公司" },
   "about.dataCompaniesDesc": { en: "Live data fetched from the Alpha Vantage API on demand.", zh: "通过 Alpha Vantage API 实时按需获取数据。" },
@@ -91,6 +91,7 @@ const translations = {
   "about.insightsDesc": { en: 'The "Latest Earnings Call Insights" feature uses AI to generate a summary of the company\'s most recent earnings call, covering key management commentary, forward guidance, analyst Q&A highlights, and strategic initiatives. The insights are based on the AI model\'s training data and may not reflect the very latest earnings call if it occurred recently.', zh: '"最新财报电话会议洞察"功能使用 AI 生成公司最近一次财报电话会议的摘要，涵盖管理层关键评论、前瞻性指引、分析师问答亮点和战略举措。洞察基于 AI 模型的训练数据，如果最近刚发生的电话会议可能尚未反映。' },
   "about.techTitle": { en: "Tech Stack", zh: "技术栈" },
   "about.backLink": { en: "← Back to Terminal", zh: "← 返回终端" },
+  "about.disclaimerTitle": { en: "Disclaimer", zh: "免责声明" },
 
   // Share page
   "share.title": { en: "Share", zh: "分享" },
